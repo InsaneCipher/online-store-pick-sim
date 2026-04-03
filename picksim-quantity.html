@@ -154,7 +154,7 @@ function confirmQty() {
     sessionStorage.setItem("hyperpick_session", JSON.stringify(s));
   }
 
-  window.location.href = `tote.html?item=${encodeURIComponent(itemName)}&qty=${confirmedQty}&tote=${tote}&id=T${String(Math.floor(Math.random()*90000)+10000)}`;
+  window.location.href = `picksim-tote.html?item=${encodeURIComponent(itemName)}&qty=${confirmedQty}&tote=${tote}&id=T${String(Math.floor(Math.random()*90000)+10000)}`;
 }
 
 setInterval(updateClock, 1000);
