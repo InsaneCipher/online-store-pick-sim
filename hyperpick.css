@@ -1037,7 +1037,14 @@ body::before {
 /* ─── RESPONSIVE ─── */
 @media (max-width: 700px) {
   .main { flex-direction: column; }
-  .handset-col { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); }
+  .handset-col {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    min-height: unset;
+    padding: 16px;
+  }
   .aisle-col { padding: 16px; }
   .items-grid { grid-template-columns: repeat(2, 1fr); }
   .totes-grid { grid-template-columns: repeat(4, 1fr); }
