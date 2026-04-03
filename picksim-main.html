@@ -304,11 +304,17 @@ function renderCurrent() {
   document.getElementById("pf-pct").textContent        = pctStr;
   document.getElementById("nav-progress").textContent  = `${picked} / ${total} items picked`;
 
-  // Build 8 item tiles: 1 correct + 7 random distractors from rest of pick list
-  const distractors = shuffle(
-    session.pickList.filter(i => i.id !== item.id)
-  ).slice(0, 7);
-  const displayItems = shuffle([item, ...distractors]);
+  // Get other items from same aisle first, fall back to any other item
+    const sameAisle = session.pickList.filter(i => i.id !== item.id && i.aisle === item.aisle);
+    const otherItems = session.pickList.filter(i => i.id !== item.id && i.aisle !== item.aisle);
+
+    // Fill up to 7 distractors with same-aisle items first, then pad with others
+    const distractors = shuffle([
+      ...shuffle(sameAisle).slice(0, 7),
+      ...shuffle(otherItems)
+    ]).slice(0, 7);
+
+    const displayItems = shuffle([item, ...distractors]);
 
   const grid = document.getElementById("items-grid");
   grid.innerHTML = "";
