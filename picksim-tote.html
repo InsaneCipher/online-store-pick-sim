@@ -26,7 +26,7 @@
           <div class="back-btn">←</div>
           <div class="pick-info">
             <div class="pick-id">PICKING - 006</div>
-            <div class="picker-name">ANDRAS</div>
+            <div class="picker-name">GUEST</div>
             <div class="pick-time" id="h-time">04:25:16 03/04/2026</div>
           </div>
           <div class="menu-btn">☰</div>
@@ -130,7 +130,15 @@ function showError(msg) {
 function handleToteClick(tile, name) {
   if (name === correctToteName) {
     tile.classList.add("correct-tote");
-    setTimeout(() => { window.location.href = "picksim.html"; }, 500);
+    setTimeout(() => {
+      const saved = sessionStorage.getItem("hyperpick_session");
+      if (saved) {
+        const s = JSON.parse(saved);
+        s.currentIdx += 1;
+        sessionStorage.setItem("hyperpick_session", JSON.stringify(s));
+      }
+      window.location.href = "picksim-main.html";
+    }, 500);
   } else {
     tile.classList.add("wrong-tote");
     setTimeout(() => tile.classList.remove("wrong-tote"), 400);
