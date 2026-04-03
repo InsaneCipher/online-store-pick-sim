@@ -54,14 +54,18 @@
           </div>
         </div>
 
-        <!-- Scan area -->
-        <div class="scan-area">
-          <div class="barcode-icon">⬛▌▌▌▌▌⬛</div>
-        </div>
-
-        <!-- Bottom bar -->
-        <div class="bottom-bar">
-          <button class="keyboard-btn" title="Keyboard">⌨️</button>
+          <!-- Hamburger menu overlay — lives inside handset-screen -->
+        <div class="menu-overlay" id="menu-overlay">
+          <div class="menu-items">
+            <div class="menu-item menu-item-orange">Item Not Available</div>
+            <div class="menu-item">Location Updating</div>
+            <div class="menu-item">Skip Item</div>
+            <div class="menu-item">Skip Bay</div>
+            <div class="menu-item">Poor Quality</div>
+            <div class="menu-item">Tote Info</div>
+            <div class="menu-item">Tote positions</div>
+            <div class="menu-item">Call Supervisor</div>
+          </div>
         </div>
     </div>
   </div>
@@ -83,6 +87,24 @@
 </div>
 
 <script>
+
+function toggleMenu() {
+  const overlay = document.getElementById("menu-overlay");
+  overlay.classList.toggle("visible");
+  // sync the clock inside the menu
+  const t = document.getElementById("h-time");
+  if (t) document.getElementById("menu-time").textContent = t.textContent;
+}
+
+// Wire up all hamburger buttons on the page
+document.querySelectorAll(".menu-btn").forEach(btn => {
+  btn.addEventListener("click", toggleMenu);
+});
+
+document.querySelectorAll(".back-btn").forEach(btn => {
+  btn.addEventListener("click", () => history.back());
+});
+
 function fmt2(n) { return String(n).padStart(2, "0"); }
 function updateClock() {
   const now = new Date();

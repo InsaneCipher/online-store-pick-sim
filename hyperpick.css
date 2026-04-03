@@ -4,25 +4,26 @@
    ═══════════════════════════════════════════ */
 
 :root {
-  --bg-dark:       #1a1a1a;
-  --bg-panel:      #222222;
-  --bg-card:       #2a2a2a;
-  --bg-header:     #161616;
-  --orange:        #e8890a;
-  --orange-dim:    #3a2200;
-  --teal:          #0abfbf;
-  --teal-dim:      #032a2a;
-  --text-primary:  #e8e8e8;
-  --text-dim:      #aaaaaa;
-  --text-muted:    #666666;
-  --border:        #3a3a3a;
-  --border-bright: #555555;
-  --red:           #d94040;
-  --red-dim:       #3a1010;
-  --handset-w:     360px;
-  --font-mono:     'Share Tech Mono', monospace;
-  --font-ui:       'Barlow Condensed', sans-serif;
-  --font-body:     'Barlow', sans-serif;
+  --bg-dark:         #1a1a1a;
+  --bg-panel:        #222222;
+  --bg-panel-bright: #282828;
+  --bg-card:         #2a2a2a;
+  --bg-header:       #161616;
+  --orange:          #e8890a;
+  --orange-dim:      #3a2200;
+  --teal:            #0abfbf;
+  --teal-dim:        #032a2a;
+  --text-primary:    #e8e8e8;
+  --text-dim:        #aaaaaa;
+  --text-muted:      #666666;
+  --border:          #3a3a3a;
+  --border-bright:   #555555;
+  --red:             #d94040;
+  --red-dim:         #3a1010;
+  --handset-w:       360px;
+  --font-mono:       'Share Tech Mono', monospace;
+  --font-ui:         'Barlow Condensed', sans-serif;
+  --font-body:       'Barlow', sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -161,6 +162,7 @@ body::before {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  position: relative;
 }
 
 /* Screen header */
@@ -530,7 +532,7 @@ body::before {
 /* ─── ITEM GRID (picksim) ─── */
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 12px;
 }
 .item-tile {
@@ -625,9 +627,51 @@ body::before {
   color: var(--text-primary);
 }
 
+/* ─── HAMBURGER MENU OVERLAY ─── */
+.menu-overlay {
+  display: none;
+  position: absolute;
+  top: 42px;
+  right: 0;
+  bottom: 0;
+  width: 95%;
+  z-index: 100;
+  flex-direction: column;
+  background: var(--bg-panel-bright);
+  overflow: hidden;
+}
+.menu-overlay.visible {
+  display: flex;
+}
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 4px;
+}
+.menu-item {
+  border: 1px solid var(--text-primary);
+  margin: 2px 10px;
+  padding: 8px 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight:600;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.1s;
+  user-select: none;
+}
+.menu-item:hover  { background: rgba(255,255,255,0.04); }
+
+
 /* ─── PROGRESS FOOTER (picksim) ─── */
 .progress-footer {
-  margin-top: auto;
+  margin-top: 0;
   padding: 12px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border);

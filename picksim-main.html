@@ -96,6 +96,19 @@
           <div class="error-text" id="h-error-text">WRONG ITEM</div>
         </div>
 
+        <!-- Hamburger menu overlay — lives inside handset-screen -->
+        <div class="menu-overlay" id="menu-overlay">
+          <div class="menu-items">
+            <div class="menu-item menu-item-orange">Item Not Available</div>
+            <div class="menu-item">Location Updating</div>
+            <div class="menu-item">Skip Item</div>
+            <div class="menu-item">Skip Bay</div>
+            <div class="menu-item">Poor Quality</div>
+            <div class="menu-item">Tote Info</div>
+            <div class="menu-item">Tote positions</div>
+            <div class="menu-item">Call Supervisor</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -136,45 +149,33 @@
       </div>
       <div class="prog-text" id="pf-pct">58%</div>
     </div>
-
   </div>
 </div>
 
 <script>
-const ITEMS_POOL = [
-  { id: 1,  name: "Js Free Range Large Eggs x6",     sku: "4094", emoji: "🥚", weight: "780g",  size: "L", aisle: "09", row: "R13", shelf: "C", pos: "01", qty: 1,  sub: "Js Free Range Eggs x12" },
-  { id: 2,  name: "Hovis Wholemeal Bread 800g",       sku: "1122", emoji: "🍞", weight: "800g",  size: "L", aisle: "09", row: "R13", shelf: "C", pos: "02", qty: 1,  sub: "Hovis White Bread 800g" },
-  { id: 3,  name: "Warburtons Crumpets x6",           sku: "2031", emoji: "🫓", weight: "340g",  size: "M", aisle: "09", row: "R13", shelf: "B", pos: "03", qty: 2,  sub: null },
-  { id: 4,  name: "Heinz Baked Beans 415g",           sku: "3310", emoji: "🫘", weight: "415g",  size: "S", aisle: "07", row: "L04", shelf: "A", pos: "05", qty: 1,  sub: "Heinz Baked Beans 200g" },
-  { id: 5,  name: "Kellogg's Corn Flakes 500g",       sku: "5501", emoji: "🌽", weight: "500g",  size: "M", aisle: "06", row: "R02", shelf: "B", pos: "02", qty: 1,  sub: "Asda Corn Flakes 500g" },
-  { id: 6,  name: "Twinings English Breakfast 80s",   sku: "6612", emoji: "🫖", weight: "250g",  size: "M", aisle: "10", row: "L07", shelf: "C", pos: "04", qty: 1,  sub: null },
-  { id: 7,  name: "Lurpak Butter Slightly Salted",    sku: "7723", emoji: "🧈", weight: "500g",  size: "L", aisle: "04", row: "R01", shelf: "A", pos: "01", qty: 2,  sub: "Anchor Butter 250g" },
-  { id: 8,  name: "Andrex Classic White Toilet Roll", sku: "8834", emoji: "🧻", weight: "1.2kg", size: "L", aisle: "14", row: "R09", shelf: "D", pos: "03", qty: 1,  sub: null },
-  { id: 9,  name: "Robinsons Orange Squash 1.75L",    sku: "9021", emoji: "🍊", weight: "1.75L", size: "L", aisle: "11", row: "L03", shelf: "B", pos: "06", qty: 1,  sub: "Robinsons Lemon Squash" },
-  { id: 10, name: "McVitie's Digestive Biscuits 400g",sku: "1045", emoji: "🍪", weight: "400g",  size: "M", aisle: "08", row: "R05", shelf: "C", pos: "02", qty: 1,  sub: "Asda Digestives 400g" },
-  { id: 11, name: "Heinz Tomato Ketchup 570g",        sku: "1156", emoji: "🍅", weight: "570g",  size: "M", aisle: "07", row: "L04", shelf: "B", pos: "01", qty: 1,  sub: null },
-  { id: 12, name: "Ariel Liquid Detergent 1.43L",     sku: "1267", emoji: "🧼", weight: "1.43L", size: "L", aisle: "15", row: "R11", shelf: "A", pos: "04", qty: 1,  sub: "Persil Liquid 1L" },
-  { id: 13, name: "Tesco Whole Milk 4 Pints",         sku: "1378", emoji: "🥛", weight: "2.27L", size: "L", aisle: "03", row: "R01", shelf: "A", pos: "01", qty: 2,  sub: "Tesco Semi-Skimmed 4 Pints" },
-  { id: 14, name: "Cathedral City Mature Cheddar 400g",sku: "1489",emoji: "🧀", weight: "400g",  size: "M", aisle: "04", row: "L02", shelf: "B", pos: "03", qty: 1,  sub: "Asda Mature Cheddar 400g" },
-  { id: 15, name: "Prince's Tuna Chunks in Brine x4", sku: "1590", emoji: "🐟", weight: "640g",  size: "M", aisle: "07", row: "R06", shelf: "C", pos: "05", qty: 1,  sub: null },
-  { id: 16, name: "Pringles Original 185g",           sku: "1601", emoji: "🥫", weight: "185g",  size: "S", aisle: "08", row: "L08", shelf: "B", pos: "02", qty: 2,  sub: "Pringles Sour Cream 185g" },
-  { id: 17, name: "Colgate Max Fresh Toothpaste",     sku: "1712", emoji: "🪥", weight: "125ml", size: "S", aisle: "16", row: "R12", shelf: "B", pos: "03", qty: 1,  sub: null },
-  { id: 18, name: "Walkers Ready Salted Crisps 6pk",  sku: "1823", emoji: "🫙", weight: "150g",  size: "S", aisle: "08", row: "L08", shelf: "A", pos: "01", qty: 1,  sub: "Walkers Cheese & Onion 6pk" },
-];
+const API = "https://shop.hyperionserver.uk";
+
+function toggleMenu() {
+  const overlay = document.getElementById("menu-overlay");
+  overlay.classList.toggle("visible");
+  const t = document.getElementById("h-time");
+  if (t) document.getElementById("menu-time").textContent = t.textContent;
+}
+document.querySelectorAll(".menu-btn").forEach(btn => btn.addEventListener("click", toggleMenu));
+document.querySelectorAll(".back-btn").forEach(btn => btn.addEventListener("click", () => history.back()));
 
 let session = {
   id: "PICKING-006", picker: "GUEST",
   pickList: [], currentIdx: 0, phase: "item",
-  correctItemId: null, correctTote: null, totes: []
+  correctItemId: null, correctTote: null
 };
 
 function saveSession() {
   sessionStorage.setItem("hyperpick_session", JSON.stringify({
-    pickList: session.pickList,
+    pickList:   session.pickList,
     currentIdx: session.currentIdx,
-    totes: session.totes,
-    id: session.id,
-    picker: session.picker
+    id:         session.id,
+    picker:     session.picker
   }));
 }
 
@@ -194,18 +195,63 @@ function updateClock() {
   document.getElementById("h-time").textContent = `${t} ${d}`;
 }
 
-function initSession() {
-  session.pickList = shuffle(ITEMS_POOL).slice(0, 8);
-  session.currentIdx = 0;
-  session.phase = "item";
-  session.totes = Array.from({length: 8}, (_,i) => ({
-    num: i + 1,
-    barcode: "T" + String(Math.floor(Math.random()*90000)+10000)
-  }));
-  document.getElementById("session-complete").classList.remove("visible");
-  document.getElementById("progress-footer").style.display = "";
+// Show a loading state while fetching
+function showLoading() {
+  document.getElementById("h-prompt").textContent = "Loading...";
+  document.getElementById("pick-view").style.display = "none";
+  document.getElementById("progress-footer").style.display = "none";
+}
+
+function showLoadError() {
+  document.getElementById("h-prompt").textContent = "Load Failed";
+  document.getElementById("items-grid").innerHTML = `
+    <div style="color:var(--red);font-family:var(--font-ui);padding:16px;">
+      Failed to load shop from API.<br><br>
+      <button class="restart-btn" onclick="initSession()">Retry</button>
+    </div>`;
   document.getElementById("pick-view").style.display = "";
-  renderCurrent();
+  document.getElementById("progress-footer").style.display = "";
+}
+
+async function initSession() {
+  showLoading();
+  try {
+    const res = await fetch(`${API}/generate-shop`);
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
+    const data = await res.json();
+
+    // Map API response to the format renderCurrent() expects
+    session.pickList = data.pick_list.map((item, idx) => ({
+      id:       idx,
+      name:     item.name,
+      sku:      item.sku,
+      emoji:    item.emoji,
+      weight:   "",
+      size:     item.size,
+      aisle:    item.aisle,
+      row:      item.row,
+      shelf:    item.shelf,
+      pos:      item.position,
+      qty:      item.quantity,
+      sub:      null,
+      tote:     item.tote,       // pre-assigned tote from API
+      allowSub: item.allow_sub,
+    }));
+
+    session.currentIdx = 0;
+    session.phase      = "item";
+    session.id         = "PICKING-" + fmt2(Math.floor(Math.random() * 99) + 1);
+
+    document.getElementById("session-id").textContent = session.id;
+    document.getElementById("session-complete").classList.remove("visible");
+    document.getElementById("progress-footer").style.display = "";
+    document.getElementById("pick-view").style.display = "";
+
+    renderCurrent();
+  } catch (e) {
+    console.error("initSession failed:", e);
+    showLoadError();
+  }
 }
 
 function renderCurrent() {
@@ -213,27 +259,25 @@ function renderCurrent() {
   session.phase = "item";
   const item = session.pickList[session.currentIdx];
   session.correctItemId = item.id;
-  const TOTE_NAMES = ["B1","B2","B3","B4","F1","F2","F3","F4"];
-  session.correctTote = TOTE_NAMES[Math.floor(Math.random() * 8)];
-  item.qty = 2; // force qty for testing
+  session.correctTote   = item.tote;  // use pre-assigned tote from API
 
-  const total = session.pickList.length;
+  const total  = session.pickList.length;
   const picked = session.currentIdx;
-  const pct = Math.round((picked / total) * 100);
+  const pct    = Math.round((picked / total) * 100);
   const pctStr = pct + "%";
 
-  document.getElementById("h-pick-id").textContent = `PICKING - ${session.id.split("-")[1] || "009"}`;
-  document.getElementById("h-aisle").textContent    = item.aisle;
-  document.getElementById("h-row").textContent      = item.row;
-  document.getElementById("h-shelf").textContent    = item.shelf;
-  document.getElementById("h-pos").textContent      = item.pos;
-  document.getElementById("h-qty").textContent      = item.qty;
-  document.getElementById("h-item-name").textContent= item.name;
-  document.getElementById("h-sku").textContent      = `SKU: ${item.sku}`;
-  document.getElementById("h-meta").textContent     = `${item.weight} · ${item.size === "L" ? "Large" : item.size === "M" ? "Medium" : "Small"}`;
-  document.getElementById("h-sub").textContent      = item.sub ? `Sub: ${item.sub}` : "No substitution";
-  document.getElementById("h-img").textContent      = item.emoji;
-  document.getElementById("h-prompt").textContent   = "Scan SKU";
+  document.getElementById("h-pick-id").textContent  = session.id;
+  document.getElementById("h-aisle").textContent     = item.aisle;
+  document.getElementById("h-row").textContent       = item.row;
+  document.getElementById("h-shelf").textContent     = item.shelf;
+  document.getElementById("h-pos").textContent       = item.pos;
+  document.getElementById("h-qty").textContent       = item.qty;
+  document.getElementById("h-item-name").textContent = item.name;
+  document.getElementById("h-sku").textContent       = `SKU: ${item.sku}`;
+  document.getElementById("h-meta").textContent      = `${item.size}`;
+  document.getElementById("h-sub").textContent       = item.allowSub ? "Substitution allowed" : "No substitution";
+  document.getElementById("h-img").textContent       = item.emoji;
+  document.getElementById("h-prompt").textContent    = "Scan SKU";
   document.getElementById("h-tote-prompt").classList.remove("visible");
   document.getElementById("h-error").classList.remove("visible");
 
@@ -243,30 +287,40 @@ function renderCurrent() {
     document.getElementById("h-next-aisle").textContent = next.aisle;
     document.getElementById("h-next-shelf").textContent = next.shelf;
     document.getElementById("h-next-qty").textContent   = `— ${next.pos} x ${next.qty}`;
+  } else {
+    // Last item — clear next bar
+    document.getElementById("h-next-row").textContent   = "-";
+    document.getElementById("h-next-aisle").textContent = "-";
+    document.getElementById("h-next-shelf").textContent = "-";
+    document.getElementById("h-next-qty").textContent   = "";
   }
 
-  document.getElementById("h-prog-bar").style.width = pctStr;
+  document.getElementById("h-prog-bar").style.width    = pctStr;
   document.getElementById("a-aisle-title").textContent = `Aisle ${item.aisle}`;
   document.getElementById("a-loc-sub").textContent     = `Row ${item.row} · Shelf ${item.shelf} · Pos ${item.pos}`;
-  document.getElementById("pf-picked").textContent = picked;
-  document.getElementById("pf-total").textContent  = total;
-  document.getElementById("pf-bar").style.width    = pctStr;
-  document.getElementById("pf-pct").textContent    = pctStr;
-  document.getElementById("nav-progress").textContent = `${picked} / ${total} items picked`;
+  document.getElementById("pf-picked").textContent     = picked;
+  document.getElementById("pf-total").textContent      = total;
+  document.getElementById("pf-bar").style.width        = pctStr;
+  document.getElementById("pf-pct").textContent        = pctStr;
+  document.getElementById("nav-progress").textContent  = `${picked} / ${total} items picked`;
 
-  const distractors = shuffle(ITEMS_POOL.filter(i => i.id !== item.id)).slice(0, 7);
+  // Build 8 item tiles: 1 correct + 7 random distractors from rest of pick list
+  const distractors = shuffle(
+    session.pickList.filter(i => i.id !== item.id)
+  ).slice(0, 7);
   const displayItems = shuffle([item, ...distractors]);
+
   const grid = document.getElementById("items-grid");
   grid.innerHTML = "";
   displayItems.forEach(di => {
     const tile = document.createElement("div");
-    tile.className = "item-tile";
-    tile.dataset.id = di.id;
-    tile.innerHTML = `
+    tile.className   = "item-tile";
+    tile.dataset.id  = di.id;
+    tile.innerHTML   = `
       <div class="tile-img">${di.emoji}</div>
       <div class="tile-name">${di.name}</div>
       <div class="tile-loc">${di.aisle} · ${di.row} · ${di.shelf}${di.pos}</div>
-      <div class="tile-weight">${di.weight}</div>
+      <div class="tile-weight">${di.size}</div>
       <div class="tile-sku">SKU: ${di.sku}</div>
     `;
     tile.addEventListener("click", () => handleItemClick(tile, di.id));
@@ -310,35 +364,6 @@ function handleItemClick(tile, clickedId) {
   }
 }
 
-function renderToteGrid() {
-  const grid = document.getElementById("totes-grid");
-  grid.innerHTML = "";
-  session.totes.forEach(tote => {
-    const tile = document.createElement("div");
-    tile.className = "tote-tile";
-    tile.dataset.num = tote.num;
-    tile.innerHTML = `
-      <div class="tote-icon">📦</div>
-      <div class="tote-num">document.getElementById("h-tote-num").textContent = session.correctTote;</div>
-      <div class="tote-barcode">${tote.barcode}</div>
-    `;
-    tile.addEventListener("click", () => handleToteClick(tile, tote.num));
-    grid.appendChild(tile);
-  });
-}
-
-function handleToteClick(tile, num) {
-  if (session.phase !== "tote") return;
-  if (num === session.correctTote) {
-    tile.classList.add("correct-tote");
-    setTimeout(() => { session.currentIdx++; renderCurrent(); }, 500);
-  } else {
-    tile.classList.add("wrong-tote");
-    setTimeout(() => tile.classList.remove("wrong-tote"), 400);
-    showError("WRONG TOTE");
-  }
-}
-
 function showComplete() {
   document.getElementById("pick-view").style.display = "none";
   document.getElementById("tote-section").classList.remove("visible");
@@ -356,11 +381,10 @@ function boot() {
   const saved = sessionStorage.getItem("hyperpick_session");
   if (saved) {
     const s = JSON.parse(saved);
-    session.pickList  = s.pickList;
-    session.totes     = s.totes;
-    session.id        = s.id;
-    session.picker    = s.picker;
+    session.pickList   = s.pickList;
     session.currentIdx = s.currentIdx;
+    session.id         = s.id;
+    session.picker     = s.picker;
     sessionStorage.removeItem("hyperpick_session");
     renderCurrent();
   } else {
