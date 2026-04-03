@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HyperPick — Confirm Quantity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hyperpick.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="logo">Hyper<span>Pick</span></div>
+  <div class="session-info">SESSION PICKING-006</div>
+</nav>
+
+<div class="main">
+  <div class="handset-col">
+    <div class="handset-device">
+      <div class="zebra-bar">ZEBRA TC57</div>
+      <div class="handset-screen">
+
+        <!-- Header -->
+        <div class="screen-header">
+          <div class="back-btn">←</div>
+          <div class="pick-info">
+            <div class="pick-id">PICKING - 006</div>
+            <div class="picker-name">ANDRAS</div>
+            <div class="pick-time" id="h-time">05:02:44 03/04/2026</div>
+          </div>
+          <div class="menu-btn">☰</div>
+        </div>
+
+        <!-- Title -->
+        <div class="confirm-title" id="confirm-title">Confirm quantity: 2</div>
+
+        <!-- Item name -->
+        <div class="item-name-box" id="item-name-box">
+          LEON Korean GFC Chicken Nuggets 300g
+        </div>
+
+        <!-- Quantity control -->
+        <div class="qty-control-box">
+          <div class="qty-control-label">Quantity</div>
+          <div class="qty-control-row">
+            <button class="qty-btn" id="btn-minus" onclick="changeQty(-1)">−</button>
+            <div class="qty-display" id="qty-display">2</div>
+            <button class="qty-btn" id="btn-plus" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <!-- Tote / Divider info -->
+        <div class="tote-info-box">
+          <div class="tote-group">
+            <div class="tote-row">
+              <span class="tote-row-label">Tote:</span>
+              <span class="tote-badge">B3</span>
+            </div>
+            <div class="tote-id-row">
+              <span class="tote-id-label">ID:</span>
+              <span class="tote-id-val">F0001452</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm button -->
+        <div class="confirm-btn-row">
+          <button class="confirm-btn" onclick="confirmQty()">Confirm</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const MAX_QTY = parseInt(params.get("qty")) || 2;
+let currentQty = MAX_QTY;
+document.getElementById("item-name-box").textContent = params.get("item") || "Unknown Item";
+document.getElementById("confirm-title").textContent = `Confirm quantity: ${MAX_QTY}`;
+// also update tote badge if passed
+const tote = params.get("tote");
+if (tote) document.querySelector(".tote-badge").textContent = tote;
+
+function fmt2(n) { return String(n).padStart(2, "0"); }
+function updateClock() {
+  const now = new Date();
+  const t = `${fmt2(now.getHours())}:${fmt2(now.getMinutes())}:${fmt2(now.getSeconds())}`;
+  const d = `${fmt2(now.getDate())}/${fmt2(now.getMonth()+1)}/${now.getFullYear()}`;
+  document.getElementById("h-time").textContent = `${t} ${d}`;
+}
+
+function changeQty(delta) {
+  const next = currentQty + delta;
+  if (next < 1 || next > MAX_QTY) return;
+  currentQty = next;
+  document.getElementById("qty-display").textContent = currentQty;
+  // Update button disabled states
+  document.getElementById("btn-minus").classList.toggle("disabled", currentQty <= 1);
+  document.getElementById("btn-plus").classList.toggle("disabled", currentQty >= MAX_QTY);
+}
+
+function confirmQty() {
+  const params = new URLSearchParams(window.location.search);
+  const tote = params.get("tote") || "01";
+  window.location.href = `tote.html?item=${encodeURIComponent(params.get("item"))}&qty=${currentQty}&tote=${tote}&id=T${String(Math.floor(Math.random()*90000)+10000)}`;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+// Set initial button states
+changeQty(0);
+</script>
+</body>
+</html>

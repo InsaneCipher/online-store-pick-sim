@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HyperPick — Place in Tote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="hyperpick.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="logo">Hyper<span>Pick</span></div>
+  <div class="session-info">SESSION PICKING-006</div>
+</nav>
+
+<div class="main">
+  <div class="handset-col">
+    <div class="handset-device">
+      <div class="zebra-bar">ZEBRA TC57</div>
+      <div class="handset-screen">
+
+        <!-- Header -->
+        <div class="screen-header">
+          <div class="back-btn">←</div>
+          <div class="pick-info">
+            <div class="pick-id">PICKING - 006</div>
+            <div class="picker-name">ANDRAS</div>
+            <div class="pick-time" id="h-time">04:25:16 03/04/2026</div>
+          </div>
+          <div class="menu-btn">☰</div>
+        </div>
+
+        <!-- Title -->
+        <div class="screen-title" id="screen-title">Place in tote &amp; scan tote</div>
+
+        <!-- Item row -->
+        <div class="item-row-box">
+          <div class="item-row-name" id="item-name">Gillette Fusion Razor Blades Refill x11</div>
+          <div class="item-row-qty" id="item-qty">1</div>
+        </div>
+
+        <!-- Tote info -->
+        <div class="tote-info-box">
+          <div class="tote-row">
+            <span class="tote-row-label">Tote:</span>
+            <span class="tote-badge" id="tote-badge">F1</span>
+            <div class="tagged-badge">🔒 Tagged</div>
+          </div>
+          <div class="tote-id-row">
+            <span class="tote-id-label">ID:</span>
+            <span class="tote-id-val" id="tote-id">JS131776</span>
+          </div>
+        </div>
+
+        <!-- Scan area -->
+        <div class="scan-area">
+          <div class="barcode-icon">⬛▌▌▌▌▌⬛</div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="bottom-bar">
+          <button class="keyboard-btn" title="Keyboard">⌨️</button>
+        </div>
+    </div>
+  </div>
+  </div>
+
+    <div class="aisle-col">
+  <div>
+    <h2>Select Tote</h2>
+    <div class="instruction">
+      <strong>Scan the correct tote</strong> — click the tote that matches the handset
+    </div>
+    <div class="totes-grid" id="totes-grid"></div>
+  </div>
+</div>
+
+<div class="error-bar" id="error-bar">
+  <div class="error-text" id="error-text">WRONG TOTE</div>
+</div>
+</div>
+
+<script>
+function fmt2(n) { return String(n).padStart(2, "0"); }
+function updateClock() {
+  const now = new Date();
+  const t = `${fmt2(now.getHours())}:${fmt2(now.getMinutes())}:${fmt2(now.getSeconds())}`;
+  const d = `${fmt2(now.getDate())}/${fmt2(now.getMonth()+1)}/${now.getFullYear()}`;
+  document.getElementById("h-time").textContent = `${t} ${d}`;
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.get("item"))  document.getElementById("item-name").textContent  = params.get("item");
+if (params.get("qty"))   document.getElementById("item-qty").textContent   = params.get("qty");
+if (params.get("tote"))  document.getElementById("tote-badge").textContent = params.get("tote");
+if (params.get("id"))    document.getElementById("tote-id").textContent    = params.get("id");
+
+const TOTE_NAMES = ["B1","B2","B3","B4","F1","F2","F3","F4"];
+const correctToteName = params.get("tote") || TOTE_NAMES[Math.floor(Math.random() * 8)];
+
+const totes = TOTE_NAMES.map(name => ({
+  name,
+  barcode: "T" + String(Math.floor(Math.random()*90000)+10000)
+}));
+
+const grid = document.getElementById("totes-grid");
+totes.forEach(tote => {
+  const tile = document.createElement("div");
+  tile.className = "tote-tile";
+  tile.innerHTML = `
+    <div class="tote-icon">📦</div>
+    <div class="tote-num">${tote.name}</div>
+    <div class="tote-barcode">${tote.barcode}</div>
+  `;
+  tile.addEventListener("click", () => handleToteClick(tile, tote.name));
+  grid.appendChild(tile);
+});
+
+let errorTimer = null;
+function showError(msg) {
+  const bar = document.getElementById("error-bar");
+  document.getElementById("error-text").textContent = msg;
+  bar.classList.add("visible");
+  if (errorTimer) clearTimeout(errorTimer);
+  errorTimer = setTimeout(() => bar.classList.remove("visible"), 2000);
+}
+
+function handleToteClick(tile, name) {
+  if (name === correctToteName) {
+    tile.classList.add("correct-tote");
+    setTimeout(() => { window.location.href = "picksim.html"; }, 500);
+  } else {
+    tile.classList.add("wrong-tote");
+    setTimeout(() => tile.classList.remove("wrong-tote"), 400);
+    showError("WRONG TOTE");
+  }
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>
