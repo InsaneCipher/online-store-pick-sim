@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HyperPick — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark:       #1a1a1a;
+    --bg-panel:      #222222;
+    --bg-card:       #2a2a2a;
+    --bg-header:     #161616;
+    --orange:        #e8890a;
+    --orange-dim:    #3a2200;
+    --teal:          #0abfbf;
+    --teal-dim:      #032a2a;
+    --text-primary:  #e8e8e8;
+    --text-dim:      #aaaaaa;
+    --text-muted:    #666666;
+    --border:        #3a3a3a;
+    --border-bright: #555555;
+    --red:           #d94040;
+    --red-dim:       #3a1010;
+    --font-mono:     'Share Tech Mono', monospace;
+    --font-ui:       'Barlow Condensed', sans-serif;
+    --font-body:     'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ── Top nav ── */
+  .top-nav {
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .top-nav .logo {
+    font-family: var(--font-ui);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+    text-transform: uppercase;
+  }
+  .top-nav .logo span { color: var(--orange); }
+  .top-nav .session-info {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+  .top-nav .session-info strong { color: var(--text-primary); }
+
+  .main {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  /* ── Left column — matches picksim handset-col exactly ── */
+  .handset-col {
+    width: 360px;
+    min-width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 20px;
+    background: var(--bg-dark);
+    border-right: 1px solid var(--border);
+    min-height: 100vh;
+  }
+
+  /* ── Device shell — matches picksim exactly ── */
+  .handset-device {
+    width: 280px;
+    height: 510px;
+    background: #1a1a1a;
+    border-radius: 36px;
+    padding: 14px;
+    padding-bottom: 40px;
+    box-shadow:
+      0 0 0 1px #333,
+      0 0 0 3px #111,
+      0 8px 40px rgba(0,0,0,0.8),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .handset-device::before {
+    content: '';
+    position: absolute;
+    left: -5px; top: 80px;
+    width: 5px; height: 30px;
+    background: #222;
+    border-radius: 3px 0 0 3px;
+    box-shadow: 0 40px 0 #222;
+  }
+  .handset-device::after {
+    content: '';
+    position: absolute;
+    right: -5px; top: 90px;
+    width: 5px; height: 45px;
+    background: #222;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .zebra-bar {
+    text-align: center;
+    padding: 6px 0 8px;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #555;
+    text-transform: uppercase;
+    border-bottom: 1px solid #222;
+    margin-bottom: 4px;
+  }
+  .zebra-bar::before { content: '≋ '; color: #444; }
+
+  /* ── Screen ── */
+  .handset-screen {
+    background: var(--bg-panel);
+    border-radius: 6px;
+    border: 1px solid #0a0a0a;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  /* ── Screen header ── */
+  .screen-header {
+    background: var(--bg-panel);
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .back-btn {
+    font-size: 16px;
+    color: var(--text-primary);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .pick-info { text-align: center; flex: 1; }
+  .pick-id {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+  }
+  .picker-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-primary);
+  }
+  .pick-time {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .menu-btn {
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  /* ── Title ── */
+  .screen-title {
+    text-align: center;
+    padding: 0px 8px 4px;
+    font-family: var(--font-ui);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+  }
+
+  /* ── Info tables ── */
+  .info-section {
+    border: 1px solid var(--border-bright);
+    margin: 1px 8px 0 8px;
+    overflow: hidden;
+  }
+
+  .info-row {
+    display: flex;
+    border-bottom: 1px solid var(--border-bright);
+  }
+  .info-row:last-child { border-bottom: none; }
+
+  .info-label {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding: 3px 8px;
+    flex: 1.4;
+    border-right: 1px solid var(--border-bright);
+    display: flex;
+    align-items: center;
+    background: transparent;
+    letter-spacing: 0.3px;
+  }
+
+  .info-value {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--text-primary);
+    padding: 0px 8px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: transparent;
+  }
+
+  /* IPH section — label takes full width left, value right */
+  .iph-section .info-label {
+    flex: 1.8;
+  }
+
+  /* ── Timer row ── */
+  .timer-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 8px;
+    margin-top: 3px;
+  }
+  .timer-icon {
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+  .timer-val {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-primary);
+    letter-spacing: 2px;
+  }
+
+  /* ── Continue button ── */
+  .continue-btn {
+    margin: 0 8px 8px 8px;
+    padding: 4px;
+    background: var(--orange);
+    border: none;
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.15s;
+  }
+  .continue-btn:hover { opacity: 0.9; }
+  .continue-btn:active { opacity: 0.75; }
+
+  /* spacer between sections */
+  .section-gap { height: 8px; }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="logo">Hyper<span>Pick</span></div>
+  <div class="session-info">
+    SESSION <strong>PICKING-010</strong><br>
+    <span>Home Screen</span>
+  </div>
+</nav>
+
+<div class="main">
+<div class="handset-col">
+<div class="handset-device">
+  <div class="zebra-bar">ZEBRA TC57</div>
+  <div class="handset-screen">
+
+    <!-- Header -->
+    <div class="screen-header">
+      <div class="back-btn">←</div>
+      <div class="pick-info">
+        <div class="pick-id" id="h-pick-id">PICKING - 010</div>
+        <div class="picker-name">ANDRAS</div>
+        <div class="pick-time" id="h-time">05:52:30 03/12/2024</div>
+      </div>
+      <div class="menu-btn">☰</div>
+    </div>
+
+    <!-- Title -->
+    <div class="screen-title">Next pick run</div>
+
+    <!-- Section 1: Run details -->
+    <div class="info-section">
+      <div class="info-row">
+        <div class="info-label">Items</div>
+        <div class="info-value">85</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Time Assigned</div>
+        <div class="info-value">05:52</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Estimated Finish Time</div>
+        <div class="info-value">06:22</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Trolley type</div>
+        <div class="info-value">CHILLED</div>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <!-- Section 2: IPH stats -->
+    <div class="info-section iph-section">
+      <div class="info-row">
+        <div class="info-label">Last Trolley IPH</div>
+        <div class="info-value">384.1</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Last Shift IPH</div>
+        <div class="info-value">179.7</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Today's IPH</div>
+        <div class="info-value">305.7</div>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <!-- Section 3: Store stats -->
+    <div class="info-section">
+      <div class="info-row">
+        <div class="info-label">Store Items to Pick</div>
+        <div class="info-value">12500</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Store Availability</div>
+        <div class="info-value">95.8%</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Store Active Pickers</div>
+        <div class="info-value">12</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Store IPH</div>
+        <div class="info-value">173.1</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Store Estimated Finish</div>
+        <div class="info-value">04:16</div>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-row">
+      <span class="timer-icon">⏱</span>
+      <span class="timer-val" id="h-timer">13</span>
+    </div>
+
+    <!-- Continue -->
+    <button class="continue-btn" onclick="window.location.href='picksim.html'">Continue</button>
+
+  </div><!-- /handset-screen -->
+</div><!-- /handset-device -->
+</div><!-- /handset-col -->
+</div><!-- /main -->
+
+<script>
+function fmt2(n) { return String(n).padStart(2, "0"); }
+
+function updateClock() {
+  const now = new Date();
+  const t = `${fmt2(now.getHours())}:${fmt2(now.getMinutes())}:${fmt2(now.getSeconds())}`;
+  const d = `${fmt2(now.getDate())}/${fmt2(now.getMonth()+1)}/${now.getFullYear()}`;
+  document.getElementById("h-time").textContent = `${t} ${d}`;
+}
+
+// Countdown timer (starts at 13, counts down, loops)
+let countdown = 13;
+function tickTimer() {
+  document.getElementById("h-timer").textContent = countdown;
+  countdown--;
+  if (countdown < 0) countdown = 13;
+}
+
+setInterval(updateClock, 1000);
+setInterval(tickTimer, 1000);
+updateClock();
+tickTimer();
+</script>
+</body>
+</html>
