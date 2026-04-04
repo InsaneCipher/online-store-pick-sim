@@ -143,6 +143,10 @@
     </div>
 
     <div class="progress-footer" id="progress-footer">
+        <!-- Active IPH display -->
+<div style="text-align:right; padding: 0 8px 4px; font-family:var(--font-mono); font-size:9px; color:var(--text-muted);">
+  <span id="h-active-iph">IPH: --</span>
+</div>
       <div class="prog-text"><strong id="pf-picked">7</strong> / <span id="pf-total">12</span> items</div>
       <div class="prog-track-wide">
         <div class="prog-fill-wide" id="pf-bar" style="width:58%"></div>
@@ -372,16 +376,27 @@ function handleItemClick(tile, clickedId) {
 }
 
 function showComplete() {
-  document.getElementById("pick-view").style.display = "none";
-  document.getElementById("tote-section").classList.remove("visible");
-  document.getElementById("progress-footer").style.display = "none";
-  document.getElementById("h-prompt").textContent = "Shop Complete";
-  document.getElementById("h-prog-bar").style.width = "100%";
-  document.getElementById("complete-stats").textContent =
-    `All ${session.pickList.length} items picked · Session ${session.id}`;
-  document.getElementById("session-complete").classList.add("visible");
-  document.getElementById("nav-progress").textContent =
-    `${session.pickList.length} / ${session.pickList.length} — Complete ✓`;
+  // Calculate final IPH for this shop
+  const start   = parseInt(sessionStorage.getItem("hyperpick_shop_start") || "0");
+  const picked  = parseInt(sessionStorage.getItem("hyperpick_items_picked") || "0");
+  let finalIPH  = 0;
+  if (start && picked > 0) {
+    const elapsedHours = (Date.now() - start) / 3600000;
+    finalIPH = Math.round(picked / elapsedHours);
+  }
+
+  // Save IPH to localStorage so home screen can display it
+  localStorage.setItem("hyperpick_last_iph", finalIPH);
+
+  // Clear shop tracking
+  sessionStorage.removeItem("hyperpick_shop_start");
+  sessionStorage.removeItem("hyperpick_items_picked");
+  sessionStorage.removeItem("hyperpick_session");
+
+  // Redirect to home after short delay so user sees completion briefly
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 2000);
 }
 
 function boot() {
