@@ -150,22 +150,24 @@ function showError(msg) {
 }
 
 function handleToteClick(tile, name) {
-  if (name === correctToteName) {
-    tile.classList.add("correct-tote");
-    setTimeout(() => {
-      const saved = sessionStorage.getItem("hyperpick_session");
-      if (saved) {
-        const s = JSON.parse(saved);
-        s.currentIdx += 1;
-        sessionStorage.setItem("hyperpick_session", JSON.stringify(s));
-      }
-      window.location.href = "picksim-main.html";
-    }, 500);
-  } else {
-    tile.classList.add("wrong-tote");
-    setTimeout(() => tile.classList.remove("wrong-tote"), 400);
-    showError("WRONG TOTE");
-  }
+    if (name === correctToteName) {
+        tile.classList.add("correct-tote");
+
+        // Increment items picked by the quantity of this item
+        const qty = parseInt(params.get("qty")) || 1;
+        const picked = parseInt(sessionStorage.getItem("hyperpick_items_picked") || "0");
+        sessionStorage.setItem("hyperpick_items_picked", picked + qty);
+
+        setTimeout(() => {
+          const saved = sessionStorage.getItem("hyperpick_session");
+          if (saved) {
+            const s = JSON.parse(saved);
+            s.currentIdx += 1;
+            sessionStorage.setItem("hyperpick_session", JSON.stringify(s));
+          }
+          window.location.href = "picksim-main.html";
+        }, 500);
+    }
 }
 
 setInterval(updateClock, 1000);

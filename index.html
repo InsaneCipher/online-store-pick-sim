@@ -263,8 +263,8 @@ function startCountdown() {
 
 // ── Start shop ─────────────────────────────────────────────────────────────────
 function startShop() {
-  // Session is already saved in sessionStorage by loadShop()
-  // picksim will detect it and skip initSession()
+  sessionStorage.setItem("hyperpick_shop_start", Date.now());
+  sessionStorage.setItem("hyperpick_items_picked", "0");
   window.location.href = "picksim-main.html";
 }
 

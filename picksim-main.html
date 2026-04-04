@@ -335,6 +335,7 @@ function renderCurrent() {
 
   document.getElementById("pick-view").style.display = "";
   document.getElementById("tote-section").classList.remove("visible");
+  updateActiveIPH();
 }
 
 let errorTimer = null;
@@ -398,7 +399,20 @@ function boot() {
   }
 }
 
+function updateActiveIPH() {
+  const start  = parseInt(sessionStorage.getItem("hyperpick_shop_start") || "0");
+  const picked = parseInt(sessionStorage.getItem("hyperpick_items_picked") || "0");
+  if (!start || picked === 0) return;
+
+  const elapsedHours = (Date.now() - start) / 3600000;
+  const iph = Math.round(picked / elapsedHours);
+
+  // Update the handset progress bar tooltip or add an IPH display
+  document.getElementById("h-active-iph").textContent = `IPH: ${iph}`;
+}
+
 setInterval(updateClock, 1000);
+setInterval(updateActiveIPH, 10000);
 updateClock();
 boot();
 </script>
