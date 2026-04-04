@@ -6,14 +6,14 @@
 <title>HyperPick — Home</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="hyperpick.css">
+<link rel="stylesheet" href="hyperpick.css?v=3">
 </head>
 <body>
 
 <nav class="top-nav">
   <div class="logo">Hyper<span>Pick</span></div>
   <div class="session-info">
-    SESSION <strong>PICKING-006</strong><br>
+    SESSION <strong id="nav-session">PICKING-???</strong><br>
     <span>Home Screen</span>
   </div>
 </nav>
@@ -28,33 +28,33 @@
     <div class="screen-header">
       <div class="back-btn">←</div>
       <div class="pick-info">
-        <div class="pick-id" id="h-pick-id">PICKING - 006</div>
+        <div class="pick-id" id="h-pick-id">PICKING - ???</div>
         <div class="picker-name">GUEST</div>
-        <div class="pick-time" id="h-time">05:52:30 03/12/2024</div>
+        <div class="pick-time" id="h-time">--:--:-- --/--/----</div>
       </div>
       <div class="menu-btn">☰</div>
     </div>
 
     <!-- Title -->
-    <div class="screen-title">Next pick run</div>
+    <div class="screen-title" id="screen-title">Loading shop...</div>
 
     <!-- Section 1: Run details -->
     <div class="info-section">
       <div class="info-row">
         <div class="info-label">Items</div>
-        <div class="info-value">85</div>
+        <div class="info-value" id="val-items">--</div>
       </div>
       <div class="info-row">
         <div class="info-label">Time Assigned</div>
-        <div class="info-value">05:52</div>
+        <div class="info-value" id="val-time-assigned">--:--</div>
       </div>
       <div class="info-row">
-        <div class="info-label">Estimated Finish Time</div>
-        <div class="info-value">06:22</div>
+        <div class="info-label">Estimated Finish</div>
+        <div class="info-value" id="val-finish-time">--:--</div>
       </div>
       <div class="info-row">
         <div class="info-label">Trolley type</div>
-        <div class="info-value">CHILLED</div>
+        <div class="info-value">AMBIENT</div>
       </div>
     </div>
 
@@ -64,15 +64,15 @@
     <div class="info-section iph-section">
       <div class="info-row">
         <div class="info-label">Last Trolley IPH</div>
-        <div class="info-value">384.1</div>
+        <div class="info-value" id="val-last-iph">0</div>
       </div>
       <div class="info-row">
         <div class="info-label">Last Shift IPH</div>
-        <div class="info-value">179.7</div>
+        <div class="info-value" id="val-shift-iph">--</div>
       </div>
       <div class="info-row">
         <div class="info-label">Today's IPH</div>
-        <div class="info-value">305.7</div>
+        <div class="info-value" id="val-today-iph">--</div>
       </div>
     </div>
 
@@ -82,34 +82,35 @@
     <div class="info-section">
       <div class="info-row">
         <div class="info-label">Store Items to Pick</div>
-        <div class="info-value">12500</div>
+        <div class="info-value" id="val-store-items">--</div>
       </div>
       <div class="info-row">
         <div class="info-label">Store Availability</div>
-        <div class="info-value">95.8%</div>
+        <div class="info-value" id="val-availability">--</div>
       </div>
       <div class="info-row">
         <div class="info-label">Store Active Pickers</div>
-        <div class="info-value">12</div>
+        <div class="info-value" id="val-pickers">--</div>
       </div>
       <div class="info-row">
         <div class="info-label">Store IPH</div>
-        <div class="info-value">173.1</div>
+        <div class="info-value" id="val-store-iph">--</div>
       </div>
       <div class="info-row">
-        <div class="info-label">Store Estimated Finish</div>
-        <div class="info-value">04:16</div>
+        <div class="info-label">Store Est. Finish</div>
+        <div class="info-value" id="val-store-finish">--:--</div>
       </div>
     </div>
 
     <!-- Timer -->
     <div class="timer-row">
       <span class="timer-icon">⏱</span>
-      <span class="timer-val" id="h-timer">13</span>
+      <span class="timer-val" id="h-timer">--</span>
     </div>
 
     <!-- Continue -->
-    <button class="continue-btn" onclick="window.location.href='picksim-main.html'">Continue</button>
+    <button class="continue-btn" id="continue-btn" disabled
+      onclick="startShop()">Loading...</button>
 
   </div><!-- /handset-screen -->
 </div><!-- /handset-device -->
@@ -117,6 +118,14 @@
 </div><!-- /main -->
 
 <script>
+const API          = "https://shop.hyperionserver.uk";
+const TARGET_IPH   = 193;   // target items per hour
+const SESSION_KEY  = "hyperpick_session";
+const LAST_IPH_KEY = "hyperpick_last_iph";
+
+let shopData = null;
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
 function fmt2(n) { return String(n).padStart(2, "0"); }
 
 function updateClock() {
@@ -126,18 +135,148 @@ function updateClock() {
   document.getElementById("h-time").textContent = `${t} ${d}`;
 }
 
-// Countdown timer (starts at 13, counts down, loops)
-let countdown = 13;
-function tickTimer() {
-  document.getElementById("h-timer").textContent = countdown;
-  countdown--;
-  if (countdown < 0) countdown = 13;
+// Add minutes to a Date and return HH:MM string
+function addMinutesToNow(mins) {
+  const d = new Date(Date.now() + mins * 60000);
+  return `${fmt2(d.getHours())}:${fmt2(d.getMinutes())}`;
 }
 
+function nowHHMM() {
+  const d = new Date();
+  return `${fmt2(d.getHours())}:${fmt2(d.getMinutes())}`;
+}
+
+// Random float between min and max with 1 decimal
+function randFloat(min, max) {
+  return (Math.random() * (max - min) + min).toFixed(1);
+}
+
+// Random int between min and max inclusive
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Generate a session ID like PICKING-042
+function genSessionId() {
+  return "PICKING-" + fmt2(randInt(1, 99));
+}
+
+// ── Load shop from API ─────────────────────────────────────────────────────────
+async function loadShop() {
+  try {
+    const res = await fetch(`${API}/generate-shop`);
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    shopData = await res.json();
+
+    const itemCount    = shopData.total_items;
+    const lineCount    = shopData.total_lines;
+    const sessionId    = genSessionId();
+
+    // Time calculations
+    const minutesToFinish = Math.ceil((itemCount / TARGET_IPH) * 60);
+    const finishTime      = addMinutesToNow(minutesToFinish);
+    const assignedTime    = nowHHMM();
+
+    // Store-level fake stats
+    const storeItems      = randInt(10000, 18000);
+    const availability    = randFloat(93, 99) + "%";
+    const activePickers   = randInt(8, 20);
+    const storeIPH        = randFloat(150, 220);
+    const storeMinutes    = Math.ceil((storeItems / (activePickers * parseFloat(storeIPH))) * 60);
+    const storeFinish     = addMinutesToNow(storeMinutes);
+
+    // Last IPH from previous session (stored in localStorage)
+    const lastIPH         = localStorage.getItem(LAST_IPH_KEY) || "0";
+    const shiftIPH        = lastIPH === "0" ? "--" : randFloat(160, 210);
+    const todayIPH        = lastIPH === "0" ? "--" : randFloat(170, 220);
+
+    // Update UI
+    document.getElementById("screen-title").textContent   = "Next pick run";
+    document.getElementById("h-pick-id").textContent      = sessionId;
+    document.getElementById("nav-session").textContent    = sessionId;
+    document.getElementById("val-items").textContent      = itemCount;
+    document.getElementById("val-time-assigned").textContent = assignedTime;
+    document.getElementById("val-finish-time").textContent   = finishTime;
+    document.getElementById("val-last-iph").textContent   = lastIPH;
+    document.getElementById("val-shift-iph").textContent  = shiftIPH;
+    document.getElementById("val-today-iph").textContent  = todayIPH;
+    document.getElementById("val-store-items").textContent= storeItems.toLocaleString();
+    document.getElementById("val-availability").textContent = availability;
+    document.getElementById("val-pickers").textContent    = activePickers;
+    document.getElementById("val-store-iph").textContent  = storeIPH;
+    document.getElementById("val-store-finish").textContent = storeFinish;
+
+    // Enable continue button
+    const btn = document.getElementById("continue-btn");
+    btn.textContent = "Continue";
+    btn.disabled    = false;
+
+    // Store session data ready for picksim
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      pickList:   shopData.pick_list.map((item, idx) => ({
+        id:       idx,
+        name:     item.name,
+        sku:      item.sku,
+        emoji:    item.emoji,
+        weight:   "",
+        size:     item.size,
+        aisle:    item.aisle,
+        row:      item.row,
+        shelf:    item.shelf,
+        pos:      item.position,
+        qty:      item.quantity,
+        sub:      null,
+        tote:     item.tote,
+        allowSub: item.allow_sub,
+      })),
+      currentIdx: 0,
+      id:         sessionId,
+      picker:     "GUEST",
+    }));
+
+    // Start countdown timer
+    startCountdown();
+
+  } catch (e) {
+    console.error("Failed to load shop:", e);
+    document.getElementById("screen-title").textContent = "Load Failed";
+    const btn = document.getElementById("continue-btn");
+    btn.textContent = "Retry";
+    btn.disabled    = false;
+    btn.onclick     = loadShop;
+  }
+}
+
+// ── Countdown timer ────────────────────────────────────────────────────────────
+let countdown     = 13;
+let countdownTimer = null;
+
+function startCountdown() {
+  countdown = 13;
+  document.getElementById("h-timer").textContent = countdown;
+  countdownTimer = setInterval(() => {
+    countdown--;
+    if (countdown < 0) countdown = 13;
+    document.getElementById("h-timer").textContent = countdown;
+  }, 1000);
+}
+
+// ── Start shop ─────────────────────────────────────────────────────────────────
+function startShop() {
+  // Session is already saved in sessionStorage by loadShop()
+  // picksim will detect it and skip initSession()
+  window.location.href = "picksim-main.html";
+}
+
+// ── Back button ────────────────────────────────────────────────────────────────
+document.querySelectorAll(".back-btn").forEach(btn => {
+  btn.addEventListener("click", () => history.back());
+});
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
 setInterval(updateClock, 1000);
-setInterval(tickTimer, 1000);
 updateClock();
-tickTimer();
+loadShop();
 </script>
 </body>
 </html>
