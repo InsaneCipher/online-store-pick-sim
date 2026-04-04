@@ -258,7 +258,7 @@ async function initSession() {
   }
 }
 
-function renderCurrent() {
+async function renderCurrent() {
   if (session.currentIdx >= session.pickList.length) { showComplete(); return; }
   session.phase = "item";
   const item = session.pickList[session.currentIdx];
@@ -309,15 +309,10 @@ function renderCurrent() {
   document.getElementById("nav-progress").textContent  = `${picked} / ${total} items picked`;
 
   // Get other items from same aisle first, fall back to any other item
-    const sameAisle = session.pickList.filter(i => i.id !== item.id && i.aisle === item.aisle);
-    const otherItems = session.pickList.filter(i => i.id !== item.id && i.aisle !== item.aisle);
-
-    // Fill up to 7 distractors with same-aisle items first, then pad with others
-    const distractors = shuffle([
-      ...shuffle(sameAisle).slice(0, 7),
-      ...shuffle(otherItems)
-    ]).slice(0, 7);
-
+    const aislePool = await getAisleItems(item.aisle);
+    const distractors = shuffle(
+      aislePool.filter(i => i.sku !== item.sku)
+    ).slice(0, 7);
     const displayItems = shuffle([item, ...distractors]);
 
   const grid = document.getElementById("items-grid");
@@ -349,6 +344,23 @@ function showError(msg) {
   bar.classList.add("visible");
   if (errorTimer) clearTimeout(errorTimer);
   errorTimer = setTimeout(() => bar.classList.remove("visible"), 2000);
+}
+
+async function getAisleItems(aisle) {
+  const res = await fetch(`${API}/items?aisle=${aisle}&limit=50`);
+  const data = await res.json();
+  return data.items.map(item => ({
+    id:    "pool-" + item.sku,
+    name:  item.name,
+    sku:   item.sku,
+    emoji: item.emoji,
+    size:  item.size,
+    aisle: item.aisle,
+    row:   item.row,
+    shelf: item.shelf,
+    pos:   item.position,
+    qty:   1,
+  }));
 }
 
 function handleItemClick(tile, clickedId) {
