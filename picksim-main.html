@@ -266,7 +266,7 @@ async function renderCurrent() {
   if (session.currentIdx >= session.pickList.length) { showComplete(); return; }
   session.phase = "item";
   const item = session.pickList[session.currentIdx];
-  session.correctItemId = item.id;
+  session.correctItemId = item.sku;
   session.correctTote   = item.tote;  // use pre-assigned tote from API
 
   const total  = session.pickList.length;
@@ -324,7 +324,7 @@ async function renderCurrent() {
   displayItems.forEach(di => {
     const tile = document.createElement("div");
     tile.className   = "item-tile";
-    tile.dataset.id  = di.id;
+    tile.dataset.id  = di.sku;
     tile.innerHTML   = `
       <div class="tile-img">${di.emoji}</div>
       <div class="tile-name">${di.name}</div>
@@ -332,7 +332,7 @@ async function renderCurrent() {
       <div class="tile-weight">${di.size}</div>
       <div class="tile-sku">SKU: ${di.sku}</div>
     `;
-    tile.addEventListener("click", () => handleItemClick(tile, di.id));
+    tile.addEventListener("click", () => handleItemClick(tile, di.sku));
     grid.appendChild(tile);
   });
 
@@ -367,9 +367,9 @@ async function getAisleItems(aisle) {
   }));
 }
 
-function handleItemClick(tile, clickedId) {
+function handleItemClick(tile, clickedSku) {
   if (session.phase !== "item") return;
-  if (clickedId === session.correctItemId) {
+  if (clickedSku === session.correctItemId) {
     tile.classList.add("correct");
     document.querySelectorAll(".item-tile").forEach(t => { if (t !== tile) t.classList.add("dimmed"); });
     const item = session.pickList[session.currentIdx];
