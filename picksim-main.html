@@ -176,6 +176,10 @@ let session = {
   correctItemId: null, correctTote: null
 };
 
+function randBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function saveSession() {
   sessionStorage.setItem("hyperpick_session", JSON.stringify({
     pickList:         session.pickList,
