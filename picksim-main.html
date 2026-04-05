@@ -388,12 +388,12 @@ function handleItemClick(tile, clickedSku) {
     if (item.qty > 1) {
       setTimeout(() => {
         saveSession();
-        window.location.href = `quantity.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}`;
+        window.location.href = `picksim-quantity.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}`;
       }, 400);
     } else {
       setTimeout(() => {
         saveSession();
-        window.location.href = `tote.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}&id=T${String(Math.floor(Math.random()*90000)+10000)}`;
+        window.location.href = `picksim-tote.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}&id=T${String(Math.floor(Math.random()*90000)+10000)}`;
       }, 400);
     }
   } else {
