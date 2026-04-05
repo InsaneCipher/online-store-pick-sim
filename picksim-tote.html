@@ -167,7 +167,19 @@ function handleToteClick(tile, name) {
           }
           window.location.href = "picksim-main.html";
         }, 500);
+    } else {
+    tile.classList.add("wrong-tote");
+    setTimeout(() => tile.classList.remove("wrong-tote"), 400);
+
+    // Wrong tote penalty — update simulated time in session
+    const saved = sessionStorage.getItem("hyperpick_session");
+    if (saved) {
+      const s = JSON.parse(saved);
+      s.simulatedSeconds = (s.simulatedSeconds || 0) + Math.floor(Math.random() * 15) + 1;
+      sessionStorage.setItem("hyperpick_session", JSON.stringify(s));
     }
+    showError("WRONG TOTE");
+  }
 }
 
 

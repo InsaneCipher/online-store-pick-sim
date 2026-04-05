@@ -158,6 +158,8 @@
 
 <script>
 const API = "https://shop.hyperionserver.uk";
+let simulatedSeconds  = 0;
+let lastAisle = null;
 
 function toggleMenu() {
   const overlay = document.getElementById("menu-overlay");
@@ -176,10 +178,12 @@ let session = {
 
 function saveSession() {
   sessionStorage.setItem("hyperpick_session", JSON.stringify({
-    pickList:   session.pickList,
-    currentIdx: session.currentIdx,
-    id:         session.id,
-    picker:     session.picker
+    pickList:         session.pickList,
+    currentIdx:       session.currentIdx,
+    id:               session.id,
+    picker:           session.picker,
+    simulatedSeconds: simulatedSeconds,
+    lastAisle:        lastAisle,
   }));
 }
 
@@ -369,56 +373,62 @@ function handleItemClick(tile, clickedId) {
     tile.classList.add("correct");
     document.querySelectorAll(".item-tile").forEach(t => { if (t !== tile) t.classList.add("dimmed"); });
     const item = session.pickList[session.currentIdx];
+
+    // Base time per item
+    simulatedSeconds += randBetween(1, 15);
+
+    // Aisle change penalty
+    if (lastAisle !== null && lastAisle !== item.aisle) {
+      simulatedSeconds += randBetween(5, 20);
+    }
+    lastAisle = item.aisle;
+
+    updateActiveIPH();
+
     if (item.qty > 1) {
       setTimeout(() => {
         saveSession();
-        window.location.href = `picksim-quantity.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}`;
+        window.location.href = `quantity.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}`;
       }, 400);
     } else {
       setTimeout(() => {
         saveSession();
-        window.location.href = `picksim-tote.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}&id=T${String(Math.floor(Math.random()*90000)+10000)}`;
+        window.location.href = `tote.html?item=${encodeURIComponent(item.name)}&qty=${item.qty}&tote=${session.correctTote}&id=T${String(Math.floor(Math.random()*90000)+10000)}`;
       }, 400);
     }
   } else {
     tile.classList.add("wrong");
     setTimeout(() => tile.classList.remove("wrong"), 400);
+    // Wrong item penalty
+    simulatedSeconds += randBetween(1, 15);
+    updateActiveIPH();
     showError("WRONG ITEM");
   }
 }
 
 function showComplete() {
-  // Calculate final IPH for this shop
-  const start   = parseInt(sessionStorage.getItem("hyperpick_shop_start") || "0");
   const picked  = parseInt(sessionStorage.getItem("hyperpick_items_picked") || "0");
   let finalIPH  = 0;
-  if (start && picked > 0) {
-    const elapsedHours = (Date.now() - start) / 3600000;
-    finalIPH = Math.round(picked / elapsedHours);
+  if (picked > 0 && simulatedSeconds > 0) {
+    finalIPH = Math.round(picked / (simulatedSeconds / 3600));
   }
-
-  // Save IPH to localStorage so home screen can display it
   localStorage.setItem("hyperpick_last_iph", finalIPH);
-
-  // Clear shop tracking
   sessionStorage.removeItem("hyperpick_shop_start");
   sessionStorage.removeItem("hyperpick_items_picked");
   sessionStorage.removeItem("hyperpick_session");
-
-  // Redirect to home after short delay so user sees completion briefly
-  setTimeout(() => {
-    window.location.href = "index.html";
-  }, 2000);
+  setTimeout(() => { window.location.href = "index.html"; }, 2000);
 }
 
 function boot() {
   const saved = sessionStorage.getItem("hyperpick_session");
   if (saved) {
     const s = JSON.parse(saved);
-    session.pickList   = s.pickList;
-    session.currentIdx = s.currentIdx;
-    session.id         = s.id;
-    session.picker     = s.picker;
+    session.pickList      = s.pickList;
+    session.currentIdx    = s.currentIdx;
+    session.id            = s.id;
+    session.picker        = s.picker;
+    simulatedSeconds      = s.simulatedSeconds || 0;
+    lastAisle             = s.lastAisle || null;
     sessionStorage.removeItem("hyperpick_session");
     renderCurrent();
   } else {
@@ -427,14 +437,10 @@ function boot() {
 }
 
 function updateActiveIPH() {
-  const start  = parseInt(sessionStorage.getItem("hyperpick_shop_start") || "0");
   const picked = parseInt(sessionStorage.getItem("hyperpick_items_picked") || "0");
-  if (!start || picked === 0) return;
-
-  const elapsedHours = (Date.now() - start) / 3600000;
+  if (picked === 0 || simulatedSeconds === 0) return;
+  const elapsedHours = simulatedSeconds / 3600;
   const iph = Math.round(picked / elapsedHours);
-
-  // Update the handset progress bar tooltip or add an IPH display
   document.getElementById("h-active-iph").textContent = `IPH: ${iph}`;
 }
 

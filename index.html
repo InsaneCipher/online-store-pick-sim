@@ -124,9 +124,15 @@ const SESSION_KEY  = "hyperpick_session";
 const LAST_IPH_KEY = "hyperpick_last_iph";
 
 let shopData = null;
+let simulatedSeconds  = 0;
+let lastAisle = null;
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function fmt2(n) { return String(n).padStart(2, "0"); }
+
+function randBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 function updateClock() {
   const now = new Date();
