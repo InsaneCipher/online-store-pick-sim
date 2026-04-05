@@ -158,7 +158,7 @@
 
 <script>
 const API = "https://shop.hyperionserver.uk";
-let simulatedSeconds  = 0;
+let simulatedSeconds  = randBetween(60, 300);
 let lastAisle = null;
 
 function toggleMenu() {
@@ -379,7 +379,7 @@ function handleItemClick(tile, clickedSku) {
     const item = session.pickList[session.currentIdx];
 
     // Base time per item
-    simulatedSeconds += randBetween(1, 15);
+    simulatedSeconds += randBetween(3, 30);
 
     // Aisle change penalty
     if (lastAisle !== null && lastAisle !== item.aisle) {
